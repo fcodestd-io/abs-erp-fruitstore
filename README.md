@@ -1,58 +1,584 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# 🍎 ABS ERP — Fruit Store
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+**ABS ERP (Alam Buah Segar)** adalah aplikasi **Enterprise Resource Planning (ERP) internal** untuk membantu operasional toko buah, mulai dari pengelolaan master data, persediaan gudang dan toko, pembelian, distribusi barang, stock opname, hingga transaksi penjualan melalui POS.
 
-## About Laravel
+Project ini dibangun sebagai aplikasi web menggunakan **Laravel** dengan pendekatan server-side rendering dan antarmuka berbasis **Tailwind CSS**.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+---
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## ✨ Features
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+### 📦 Product Management
 
-## Learning Laravel
+* Manajemen produk buah
+* Harga pokok dan harga jual
+* Satuan toko
+* Satuan gudang
+* Pencarian produk
+* Product list dapat diakses seluruh role yang sudah login
+* CRUD produk dibatasi untuk Owner dan Admin
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+### 🏪 Store Management
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+* Manajemen cabang toko
+* Pengelolaan stok produk per toko
+* Penambahan produk ke toko
+* Stock opname toko
+* Riwayat sesi stock opname
+* Pencatatan operator opname
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+### 🏭 Warehouse Management
 
-## Agentic Development
+* Manajemen gudang
+* Pengelolaan stok produk per gudang
+* Penambahan produk ke gudang
+* Stock opname gudang
+* Draft opname
+* Penyelesaian opname
+* Pembatalan sesi opname
+* Riwayat stock adjustment
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+### 🛒 Purchase Order
 
-```bash
-composer require laravel/boost --dev
+* Membuat Purchase Order
+* Pemilihan supplier
+* Pemilihan gudang tujuan
+* Detail item pembelian
+* Status Purchase Order
+* Penyelesaian Purchase Order
+* Pembatalan Purchase Order
+* Perubahan stok berdasarkan proses penerimaan
 
-php artisan boost:install
+### 🚚 Shipment / Distribusi
+
+Mendukung alur distribusi barang:
+
+```text
+Warehouse
+    │
+    │  Shipment
+    ▼
+Store
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+Fitur:
 
-## Contributing
+* Membuat surat jalan / shipment
+* Memilih gudang asal
+* Memilih toko tujuan
+* Mengirim produk berdasarkan stok gudang
+* Stok gudang otomatis berkurang ketika shipment dibuat
+* Shipment memiliki status `pending`, `completed`, atau `canceled`
+* Toko dapat menginput jumlah barang yang diterima
+* Stok toko otomatis bertambah setelah penerimaan
+* Pembatalan shipment mengembalikan stok ke gudang
+* Pencatatan warehouse supervisor
+* Pencatatan cashier yang menerima barang
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+### 🧾 POS / Sales
 
-## Code of Conduct
+Point of Sale untuk transaksi penjualan toko.
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+Fitur:
 
-## Security Vulnerabilities
+* POS kasir
+* Pemilihan toko
+* Keranjang penjualan
+* Validasi stok
+* Pengurangan stok otomatis
+* Perhitungan subtotal
+* Diskon transaksi
+* Total pembayaran
+* Pembayaran:
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+  * Cash
+  * QRIS
+  * Transfer
+* Perhitungan kembalian untuk pembayaran cash
+* Nomor invoice otomatis
+* Pencatatan cashier
+* Cetak struk thermal
+* Riwayat transaksi penjualan
+* Filter berdasarkan tanggal dan toko
+* Ringkasan omzet
+* Total diskon
+* Jumlah transaksi
+* Rata-rata transaksi
+* Breakdown omzet berdasarkan metode pembayaran
 
-## License
+### 🏷️ Discount Management
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Owner dapat membuat program diskon berdasarkan:
+
+* Nama program
+* Toko
+* Periode mulai
+* Periode berakhir
+* Produk
+* Persentase diskon
+* Minimum quantity
+
+Program diskon aktif otomatis digunakan oleh POS ketika transaksi dilakukan pada toko dan periode yang sesuai.
+
+Discount juga dapat diakhiri secara manual sebelum tanggal berakhir.
+
+### 👥 User & Role Management
+
+Sistem menggunakan role-based access control.
+
+Role yang tersedia:
+
+| Role                   | Keterangan                                       |
+| ---------------------- | ------------------------------------------------ |
+| `owner`                | Akses penuh terhadap sistem dan pengelolaan user |
+| `admin`                | Administrasi operasional                         |
+| `warehouse_supervisor` | Operasional gudang dan distribusi                |
+| `cashier`              | Operasional toko dan POS                         |
+
+User dapat dikaitkan dengan:
+
+* Warehouse
+* Store
+
+Pembatasan akses diterapkan melalui middleware role dan filtering pada controller.
+
+Contohnya, warehouse supervisor hanya melihat shipment dari gudang yang ditugaskan, sedangkan cashier hanya melihat shipment yang ditujukan ke toko tempatnya bertugas.
+
+---
+
+## 🔄 Inventory Flow
+
+### Purchase
+
+```text
+Supplier
+   │
+   ▼
+Purchase Order
+   │
+   ▼
+Warehouse
+   │
+   ▼
+Warehouse Stock
+```
+
+### Distribution
+
+```text
+Warehouse Stock
+      │
+      │ Shipment
+      ▼
+    Store
+      │
+      ▼
+ Store Stock
+```
+
+### Sales
+
+```text
+Store Stock
+     │
+     │ POS
+     ▼
+   Sale
+     │
+     ▼
+Stock berkurang
+```
+
+Shipment memotong stok gudang ketika dibuat, kemudian menambahkan stok toko berdasarkan jumlah yang diterima ketika shipment diselesaikan.
+
+---
+
+## 📊 Stock Opname
+
+Stock opname digunakan untuk mencocokkan stok sistem dengan stok fisik.
+
+Alurnya:
+
+```text
+System Stock
+     │
+     ▼
+Physical Counting
+     │
+     ▼
+Actual Stock
+     │
+     ▼
+Stock Adjustment
+     │
+     ▼
+Updated Stock
+```
+
+Setiap item opname menyimpan:
+
+* System stock
+* Actual stock
+* Adjustment
+* Item note
+
+Sesi opname juga memiliki:
+
+* Operator
+* Code
+* Note
+* Status
+* Created at
+* Completed at
+* Canceled at
+
+Opname dapat disimpan sebagai draft sebelum diselesaikan.
+
+---
+
+## 🔐 Access Control
+
+Secara umum pembagian akses aplikasi:
+
+### Owner
+
+* User management
+* Discount management
+* Product management
+* Supplier management
+* Warehouse management
+* Store management
+* Purchase Order
+* Shipment
+* POS
+* Sales report
+
+### Admin
+
+* Product management
+* Supplier management
+* Warehouse management
+* Store management
+* Purchase Order
+* Shipment
+* POS
+* Sales report
+
+### Warehouse Supervisor
+
+* Warehouse
+* Warehouse stock
+* Stock opname
+* Purchase Order
+* Shipment
+
+### Cashier
+
+* Store
+* Store stock
+* Stock opname toko
+* POS
+* Sales
+* Penerimaan shipment untuk toko yang ditugaskan
+
+Seluruh route aplikasi berada di balik authentication, sedangkan fitur tertentu dibatasi menggunakan middleware role.
+
+---
+
+## 🛠️ Tech Stack
+
+### Backend
+
+* PHP 8.3+
+* Laravel 13
+* Laravel Eloquent ORM
+* Laravel Blade
+
+### Frontend
+
+* Blade
+* Tailwind CSS 4
+* Alpine.js
+* Vite
+
+### Development Tools
+
+* Composer
+* NPM
+* Vite
+* PHPUnit
+* Laravel Pint
+
+Konfigurasi package project menunjukkan PHP `^8.3`, Laravel `^13.17`, Tailwind CSS `^4.0`, dan Vite `^8.0`.
+
+---
+
+## 🚀 Installation
+
+### 1. Clone Repository
+
+```bash
+git clone https://github.com/fcodestd-io/abs-erp-fruitstore.git
+
+cd abs-erp-fruitstore
+```
+
+### 2. Install PHP Dependencies
+
+```bash
+composer install
+```
+
+### 3. Setup Environment
+
+Copy `.env.example` menjadi `.env`.
+
+```bash
+cp .env.example .env
+```
+
+Kemudian konfigurasi database pada `.env`.
+
+Contoh:
+
+```env
+APP_NAME="ABS ERP"
+APP_ENV=local
+APP_DEBUG=true
+
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=abs_erp
+DB_USERNAME=root
+DB_PASSWORD=
+```
+
+### 4. Generate Application Key
+
+```bash
+php artisan key:generate
+```
+
+### 5. Run Migration
+
+```bash
+php artisan migrate
+```
+
+### 6. Install Frontend Dependencies
+
+```bash
+npm install
+```
+
+### 7. Run Development Server
+
+Jalankan Laravel:
+
+```bash
+php artisan serve
+```
+
+Kemudian jalankan Vite pada terminal lain:
+
+```bash
+npm run dev
+```
+
+Atau gunakan script development yang tersedia pada project:
+
+```bash
+composer run dev
+```
+
+---
+
+## 🗂️ Project Structure
+
+Struktur utama Laravel:
+
+```text
+abs-erp-fruitstore/
+│
+├── app/
+│   ├── Http/
+│   │   └── Controllers/
+│   │
+│   └── Models/
+│
+├── database/
+│   ├── factories/
+│   ├── migrations/
+│   └── seeders/
+│
+├── resources/
+│   ├── css/
+│   ├── js/
+│   └── views/
+│
+├── routes/
+│   └── web.php
+│
+├── public/
+├── storage/
+├── tests/
+│
+├── artisan
+├── composer.json
+├── package.json
+└── vite.config.js
+```
+
+---
+
+## 🧩 Main Modules
+
+```text
+ABS ERP
+│
+├── Authentication
+│
+├── Dashboard
+│
+├── User Management
+│
+├── Master Data
+│   ├── Products
+│   ├── Units
+│   ├── Suppliers
+│   ├── Stores
+│   └── Warehouses
+│
+├── Inventory
+│   ├── Warehouse Stock
+│   ├── Store Stock
+│   └── Stock Opname
+│
+├── Procurement
+│   └── Purchase Order
+│
+├── Distribution
+│   └── Shipment
+│
+├── Sales
+│   ├── POS
+│   ├── Sales History
+│   └── Receipt
+│
+└── Promotion
+    └── Discount
+```
+
+---
+
+## 🔗 Application Flow
+
+Secara keseluruhan, sistem dirancang dengan alur operasional:
+
+```text
+                ┌─────────────┐
+                │   Supplier  │
+                └──────┬──────┘
+                       │
+                       ▼
+                ┌─────────────┐
+                │ Purchase PO │
+                └──────┬──────┘
+                       │
+                       ▼
+                ┌─────────────┐
+                │  Warehouse  │
+                │    Stock    │
+                └──────┬──────┘
+                       │
+                       │ Shipment
+                       ▼
+                ┌─────────────┐
+                │    Store    │
+                │    Stock    │
+                └──────┬──────┘
+                       │
+                       │ POS
+                       ▼
+                ┌─────────────┐
+                │    Sales    │
+                └─────────────┘
+```
+
+Stock opname dapat dilakukan pada warehouse maupun store untuk melakukan penyesuaian berdasarkan kondisi stok fisik.
+
+---
+
+## 🧪 Testing
+
+Menjalankan test suite:
+
+```bash
+php artisan test
+```
+
+Atau:
+
+```bash
+composer run test
+```
+
+---
+
+## 🎯 Project Purpose
+
+ABS ERP dibuat sebagai aplikasi operasional untuk mensimulasikan dan mengelola proses bisnis toko buah dengan beberapa titik persediaan.
+
+Fokus utama project:
+
+* Inventory management
+* Procurement
+* Warehouse management
+* Store management
+* Internal distribution
+* Stock reconciliation
+* Point of Sale
+* Sales reporting
+* Role-based access control
+
+Project ini juga menjadi implementasi pembelajaran mengenai bagaimana proses bisnis nyata diterjemahkan menjadi **database, business logic, transaction flow, authorization, dan user interface** dalam sebuah aplikasi Laravel.
+
+---
+
+## 📌 Project Status
+
+**Active Development**
+
+Beberapa bagian sistem masih dapat dikembangkan lebih lanjut, terutama:
+
+* Automated testing
+* Reporting yang lebih lengkap
+* Audit log
+* Granular permission
+* Financial/accounting module
+* Dashboard analytics
+* Deployment production
+* Backup & recovery strategy
+
+---
+
+## 👨‍💻 Author
+
+**FCodeStd**
+
+GitHub:
+
+https://github.com/fcodestd-io
+
+Repository:
+
+https://github.com/fcodestd-io/abs-erp-fruitstore
+
+---
+
+## 📄 License
+
+This project is currently intended as a personal development / portfolio project.
+
+The Laravel framework used by this project is open-source software licensed under the MIT license.
