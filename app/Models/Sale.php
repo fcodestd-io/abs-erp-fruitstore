@@ -21,6 +21,7 @@ class Sale extends Model
         'change_amount',
         'payment_method',
         'note',
+        'cashier_id',
     ];
 
     protected $casts = [
@@ -30,6 +31,11 @@ class Sale extends Model
         'paid_amount' => 'decimal:2',
         'change_amount' => 'decimal:2',
     ];
+
+    public function cashier(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'cashier_id');
+    }
 
     /**
      * Relasi ke Toko

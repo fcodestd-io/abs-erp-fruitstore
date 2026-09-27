@@ -267,6 +267,11 @@ return new class extends Migration
             $table->foreignId('store_id')
                 ->constrained('stores');
 
+            $table->foreignId('cashier_id')
+                ->nullable()
+                ->constrained('users')
+                ->nullOnDelete();
+
             $table->string('code')->unique();
 
             $table->decimal('subtotal', 15, 2)->default(0);

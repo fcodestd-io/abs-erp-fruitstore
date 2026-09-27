@@ -160,9 +160,7 @@
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-4">
                 <div>
                     <div class="flex items-center gap-2">
-                        <a href="{{ route('warehouses.index') }}" class="text-slate-400 hover:text-slate-600 transition">
-                            <i data-lucide="arrow-left" class="w-5 h-5"></i>
-                        </a>
+                      
                         <h1 class="text-xl font-black text-slate-900">{{ $warehouse->name }}</h1>
                     </div>
                     <p class="text-xs text-slate-500 mt-1 flex items-center gap-1">

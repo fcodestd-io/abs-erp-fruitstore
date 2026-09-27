@@ -9,6 +9,7 @@ use App\Models\Store;
 use App\Models\StoreStock;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
@@ -158,6 +159,7 @@ class SaleController extends Controller
                 'change_amount' => $changeAmount,
                 'payment_method' => $request->payment_method,
                 'note' => $request->note,
+                'cashier_id' => Auth::id(),
             ]);
 
             // Simpan Items
@@ -192,36 +194,80 @@ class SaleController extends Controller
     {
         $search = $request->query('search');
         $storeId = $request->query('store_id');
-        $startDate = $request->query('start_date', date('Y-m-01')); // Default awal bulan
-        $endDate = $request->query('end_date', date('Y-m-d'));   // Default hari ini
+        $startDate = $request->query('start_date', date('Y-m-01'));
+        $endDate = $request->query('end_date', date('Y-m-d'));
 
         $user = auth()->user();
 
-        $query = Sale::with(['store', 'items.product.storeUnit'])
-            ->when($user->role === 'cashier', fn ($q) => $q->where('store_id', $user->store_id))
-            ->when($storeId, fn ($q) => $q->where('store_id', $storeId))
-            ->when($search, fn ($q) => $q->where('code', 'like', "%{$search}%"))
-            ->when($startDate, fn ($q) => $q->whereDate('created_at', '>=', $startDate))
-            ->when($endDate, fn ($q) => $q->whereDate('created_at', '<=', $endDate));
+        $query = Sale::with([
+            'store',
+            'cashier',
+            'items.product.storeUnit',
+        ])
+            ->when(
+                $user->role === 'cashier',
+                fn ($q) => $q->where('store_id', $user->store_id)
+            )
+            ->when(
+                $storeId,
+                fn ($q) => $q->where('store_id', $storeId)
+            )
+            ->when(
+                $search,
+                fn ($q) => $q->where('code', 'like', "%{$search}%")
+            )
+            ->when(
+                $startDate,
+                fn ($q) => $q->whereDate('created_at', '>=', $startDate)
+            )
+            ->when(
+                $endDate,
+                fn ($q) => $q->whereDate('created_at', '<=', $endDate)
+            );
 
-        // Hitung ringkasan statistik (KPI) berdasarkan query filter
+        // Hitung ringkasan statistik (KPI)
         $totalOmset = (clone $query)->sum('total_amount');
         $totalDiscount = (clone $query)->sum('discount');
         $totalCount = (clone $query)->count();
-        $avgTransaction = $totalCount > 0 ? ($totalOmset / $totalCount) : 0;
 
-        // Breakdown Per Metode Pembayaran
-        $cashOmset = (clone $query)->where('payment_method', 'cash')->sum('total_amount');
-        $qrisOmset = (clone $query)->where('payment_method', 'qris')->sum('total_amount');
-        $transferOmset = (clone $query)->where('payment_method', 'transfer')->sum('total_amount');
+        $avgTransaction = $totalCount > 0
+            ? ($totalOmset / $totalCount)
+            : 0;
 
-        $sales = $query->latest()->paginate(15)->withQueryString();
+        // Breakdown metode pembayaran
+        $cashOmset = (clone $query)
+            ->where('payment_method', 'cash')
+            ->sum('total_amount');
+
+        $qrisOmset = (clone $query)
+            ->where('payment_method', 'qris')
+            ->sum('total_amount');
+
+        $transferOmset = (clone $query)
+            ->where('payment_method', 'transfer')
+            ->sum('total_amount');
+
+        $sales = $query
+            ->latest()
+            ->paginate(15)
+            ->withQueryString();
+
         $stores = Store::orderBy('name', 'asc')->get();
 
         return view('sales.index', compact(
-            'sales', 'stores', 'search', 'storeId', 'startDate', 'endDate',
-            'totalOmset', 'totalDiscount', 'totalCount', 'avgTransaction',
-            'cashOmset', 'qrisOmset', 'transferOmset'
+            'sales',
+            'stores',
+            'search',
+            'storeId',
+            'startDate',
+            'endDate',
+            'totalOmset',
+            'totalDiscount',
+            'totalCount',
+            'avgTransaction',
+            'cashOmset',
+            'qrisOmset',
+            'transferOmset'
         ));
     }
 

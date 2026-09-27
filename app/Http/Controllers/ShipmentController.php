@@ -15,7 +15,6 @@ use Illuminate\Support\Str;
 
 class ShipmentController extends Controller
 {
-    // 1. Halaman Index: Riwayat Shipment, Filter, Detail, & Konfirmasi Penerimaan Toko
     public function index(Request $request)
     {
         $search = $request->query('search');
@@ -34,34 +33,79 @@ class ShipmentController extends Controller
             'cashier',
             'items.product.warehouseUnit',
             'items.product.storeUnit',
-        ])
-            ->when($user->role === 'warehouse_supervisor', function ($q) use ($user) {
-                $q->where('warehouse_id', $user->warehouse_id);
-            })
-            ->when($user->role === 'cashier', function ($q) use ($user) {
-                $q->where('store_id', $user->store_id);
-            })
-            ->when($search, function ($q) use ($search) {
-                $q->where(function ($sub) use ($search) {
-                    $sub->where('code', 'like', "%{$search}%")
-                        ->orWhere('note', 'like', "%{$search}%")
-                        ->orWhereHas('warehouse', fn ($w) => $w->where('name', 'like', "%{$search}%"))
-                        ->orWhereHas('store', fn ($s) => $s->where('name', 'like', "%{$search}%"));
-                });
-            })
-            ->when($status, fn ($q) => $q->where('status', $status))
-            ->when($month, fn ($q) => $q->whereMonth('created_at', $month))
-            ->when($year, fn ($q) => $q->whereYear('created_at', $year))
-            ->when($storeId, fn ($q) => $q->where('store_id', $storeId))
-            ->when($warehouseId, fn ($q) => $q->where('warehouse_id', $warehouseId));
+        ]);
 
-        $shipments = $query->latest()->paginate(10)->withQueryString();
+        // Warehouse supervisor hanya melihat pengiriman dari gudangnya
+        if ($user->role === 'warehouse_supervisor') {
+            $query->where('warehouse_id', $user->warehouse_id);
+        }
+
+        // Cashier hanya melihat pengiriman ke toko tempat dia bertugas
+        if ($user->role === 'cashier') {
+            $query->where('store_id', $user->store_id);
+        }
+
+        // Search
+        $query->when($search, function ($q) use ($search) {
+            $q->where(function ($sub) use ($search) {
+                $sub->where('code', 'like', "%{$search}%")
+                    ->orWhere('note', 'like', "%{$search}%")
+                    ->orWhereHas('warehouse', function ($warehouse) use ($search) {
+                        $warehouse->where('name', 'like', "%{$search}%");
+                    })
+                    ->orWhereHas('store', function ($store) use ($search) {
+                        $store->where('name', 'like', "%{$search}%");
+                    });
+            });
+        });
+
+        // Filter status
+        $query->when($status, function ($q) use ($status) {
+            $q->where('status', $status);
+        });
+
+        // Filter bulan
+        $query->when($month, function ($q) use ($month) {
+            $q->whereMonth('created_at', $month);
+        });
+
+        // Filter tahun
+        $query->when($year, function ($q) use ($year) {
+            $q->whereYear('created_at', $year);
+        });
+
+        // Cashier tidak boleh mengganti store_id melalui URL
+        if ($user->role !== 'cashier') {
+            $query->when($storeId, function ($q) use ($storeId) {
+                $q->where('store_id', $storeId);
+            });
+        }
+
+        // Warehouse supervisor tidak boleh mengganti warehouse_id melalui URL
+        if ($user->role !== 'warehouse_supervisor') {
+            $query->when($warehouseId, function ($q) use ($warehouseId) {
+                $q->where('warehouse_id', $warehouseId);
+            });
+        }
+
+        $shipments = $query
+            ->latest()
+            ->paginate(10)
+            ->withQueryString();
 
         $warehouses = Warehouse::orderBy('name', 'asc')->get();
         $stores = Store::orderBy('name', 'asc')->get();
 
         return view('shipments.index', compact(
-            'shipments', 'warehouses', 'stores', 'search', 'status', 'month', 'year', 'storeId', 'warehouseId'
+            'shipments',
+            'warehouses',
+            'stores',
+            'search',
+            'status',
+            'month',
+            'year',
+            'storeId',
+            'warehouseId'
         ));
     }
 

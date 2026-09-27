@@ -26,8 +26,19 @@ class AuthController extends Controller
         if (Auth::attempt($credentials, $request->boolean('remember'))) {
             $request->session()->regenerate();
 
+            $user = Auth::user();
+
+            // Simpan ID Gudang / Toko penanggung jawab ke Session
+            if ($user->role === 'warehouse_supervisor' && $user->warehouse_id) {
+                session(['warehouse_id' => $user->warehouse_id]);
+            }
+
+            if ($user->role === 'cashier' && $user->store_id) {
+                session(['store_id' => $user->store_id]);
+            }
+
             return redirect()->intended(route('dashboard'))
-                ->with('success', 'Selamat datang kembali, '.Auth::user()->username);
+                ->with('success', 'Selamat datang kembali, '.$user->username);
         }
 
         throw ValidationException::withMessages([
